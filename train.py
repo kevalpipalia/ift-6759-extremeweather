@@ -10,9 +10,7 @@ from sklearn.linear_model import LogisticRegression
 
 
 def add_args(parser):
-    """
-    Add arguments to parser
-    """
+    """Add arguments to the parser."""
     parser.add_argument(
         "--train",
         default=None,
@@ -29,28 +27,28 @@ def add_args(parser):
 
 
 def main(args):
-    # Read data
+    # read data
     if args.train:
         df_tr = pd.read_csv(args.train, index_col=0)
     else:
-        print("Train data file missing")
+        print("train data file missing")
         return
     if args.test:
         df_tt = pd.read_csv(args.test, index_col=0)
     else:
-        print("Test data file missing")
+        print("test data file missing")
         return
     features = [f for f in df_tr.keys() if f not in ["lat", "lon", "time", "LABELS"]]
     x_tr = df_tr[features].values
     x_tt = df_tt[features].values
     y_tr = df_tr.LABELS.values
     y_tt = df_tt.LABELS.values
-    print(f"Number of features: {len(features)}")
-    print(f"Number of classes: {np.unique(y_tr).shape[0]}")
-    print(f"Train size: {x_tr.shape[0]}")
-    print(f"Test size: {x_tt.shape[0]}")
+    print(f"number of features: {len(features)}")
+    print(f"number of classes: {np.unique(y_tr).shape[0]}")
+    print(f"train size: {x_tr.shape[0]}")
+    print(f"test size: {x_tt.shape[0]}")
 
-    # Normalize
+    # normalize
     mean_tr = np.mean(x_tr, axis=0)
     mean_tr = mean_tr[np.newaxis, :]
     std_tr = np.std(x_tr, axis=0)
@@ -58,11 +56,11 @@ def main(args):
     x_tr = (x_tr - mean_tr) / std_tr
     x_tt = (x_tt - mean_tr) / std_tr
 
-    # Train models
+    # train models
     baseline = DummyClassifier(strategy="most_frequent").fit(x_tr, y_tr)
     logreg = LogisticRegression(random_state=0, max_iter=500).fit(x_tr, y_tr)
 
-    # Evaluation
+    # evaluation
     baseline_acc_tr = baseline.score(x_tr, y_tr)
     baseline_acc_tt = baseline.score(x_tt, y_tt)
     logreg_acc_tt = logreg.score(x_tt, y_tt)
@@ -70,10 +68,10 @@ def main(args):
     logreg_pred_tt = logreg.predict(x_tt)
     logreg_acc_tt_aux = np.mean(logreg_pred_tt == y_tt)
     assert np.isclose(logreg_acc_tt, logreg_acc_tt_aux)
-    print("Baseline - Train accuracy: {:.4f}".format(baseline_acc_tr))
-    print("Baseline - Test accuracy: {:.4f}".format(baseline_acc_tt))
-    print("LogReg - Train accuracy: {:.4f}".format(logreg_acc_tr))
-    print("LogReg - Test accuracy: {:.4f}".format(logreg_acc_tt))
+    print("baseline - train accuracy: {:.4f}".format(baseline_acc_tr))
+    print("baseline - test accuracy: {:.4f}".format(baseline_acc_tt))
+    print("logReg - train accuracy: {:.4f}".format(logreg_acc_tr))
+    print("logReg - test accuracy: {:.4f}".format(logreg_acc_tt))
 
 
 if __name__ == "__main__":
