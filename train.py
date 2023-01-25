@@ -1,12 +1,12 @@
 """
 A script to train a machine learning model on ClimateNet
 """
-from argparse import ArgumentParser
-
 import numpy as np
 import pandas as pd
+import torch
+from sklearn.linear_model import LogisticRegression, Lasso
 from sklearn.dummy import DummyClassifier
-from sklearn.linear_model import LogisticRegression
+from argparse import ArgumentParser
 
 
 def add_args(parser):
@@ -15,7 +15,7 @@ def add_args(parser):
         "--train",
         default=None,
         type=str,
-        help="Train CSV",
+        help="Train CSV"
     )
     parser.add_argument(
         "--test",
@@ -50,10 +50,10 @@ def main(args):
 
     # normalize
     mean_tr = np.mean(x_tr, axis=0)
-    mean_tr = mean_tr[np.newaxis, :]
+    mean_tr = mean_tr[np.newaxis,:]
     std_tr = np.std(x_tr, axis=0)
-    std_tr = std_tr[np.newaxis, :]
-    x_tr = (x_tr - mean_tr) / std_tr
+    std_tr = std_tr[np.newaxis,:]
+    x_tr = (x_tr-mean_tr)/ std_tr
     x_tt = (x_tt - mean_tr) / std_tr
 
     # train models
@@ -61,7 +61,8 @@ def main(args):
     logreg = LogisticRegression(random_state=0, max_iter=500).fit(x_tr, y_tr)
 
     # evaluation
-    baseline_acc_tr = baseline.score(x_tr, y_tr)
+    baseline_acc_tr = baseline.score(
+        x_tr, y_tr)
     baseline_acc_tt = baseline.score(x_tt, y_tt)
     logreg_acc_tt = logreg.score(x_tt, y_tt)
     logreg_acc_tr = logreg.score(x_tr, y_tr)
